@@ -1,21 +1,60 @@
 # encurta.
 
-Um encurtador de links responsivo em português, com URLs permanentes armazenadas no Supabase e redirecionamento pelo GitHub Pages.
+Encurtador de links em português. O Cloudflare Worker serve o site, cria códigos curtos e redireciona os links; o Cloudflare D1 guarda os destinos permanentemente.
 
-## Configuração do banco (Supabase)
+## Publicar no Cloudflare Workers
 
-1. Crie um projeto em [supabase.com](https://supabase.com).
-2. No painel do projeto, abra **SQL Editor**, cole o conteúdo de `schema.sql` e execute.
-3. Em **Project Settings → API**, copie a **Project URL** e a chave **anon/public**.
-4. Edite `config.js` e substitua `SUPABASE_URL` e `SUPABASE_ANON_KEY` pelos valores do seu projeto. A chave `anon` é pública e pode ficar no frontend; as políticas RLS do SQL limitam as operações às necessárias para o encurtador.
-5. Publique o repositório em **Settings → Pages**, escolhendo a branch `main` e a pasta `/ (root)`.
+Pré-requisitos: uma conta Cloudflare e Node.js/npm instalados.
 
-O endereço curto usa o próprio domínio do GitHub Pages, no formato `https://jetee01.github.io/teste-encurtador/CODIGO`. Se publicar em outro endereço ou domínio, ajuste `APP_BASE_PATH` em `config.js` e a tag `<base>` de `404.html` para o caminho base do site (use `/` para domínio configurado na raiz).
+1. Clone o repositório e entre na pasta:
 
-## Uso e notas
+   ```bash
+   git clone https://github.com/jetee01/teste-encurtador.git
+   cd teste-encurtador
+   npm install --save-dev wrangler
+   npx wrangler login
+   ```
 
-- Links são criados com códigos aleatórios de sete caracteres e guardados no banco; não expiram automaticamente.
-- `404.html` trata as rotas curtas no GitHub Pages e consulta o destino no Supabase.
-- Os links e destinos são públicos por definição. Não use para guardar URLs privadas.
-- Para uso público em escala, adicione rate limiting, proteção contra abuso e monitoramento com uma Edge Function ou API. As políticas abertas permitem que visitantes anônimos criem links.
-- O site não funciona plenamente até configurar o Supabase e publicar o schema.
+2. Crie o banco D1:
+
+   ```bash
+   npx wrangler d1 create encurta-links
+   ```
+
+   Copie o `database_id` mostrado e substitua `SUBSTITUA_PELO_ID_DO_D1` em `wrangler.toml`.
+
+3. Crie a tabela no banco remoto:
+
+   ```bash
+   npx wrangler d1 execute encurta-links --remote --file=./schema.sql
+   ```
+
+4. Publique o site e o Worker:
+
+   ```bash
+   npx wrangler deploy
+   ```
+
+   O comando exibirá o endereço `*.workers.dev`. A página e os links curtos ficam no mesmo domínio.
+
+5. (Opcional) Para usar seu próprio domínio, abra **Workers & Pages → encurta-links → Settings → Domains & Routes** no painel Cloudflare e adicione um domínio/rota. O domínio precisa estar configurado na Cloudflare.
+
+## Desenvolvimento local
+
+Depois de preencher o `database_id` em `wrangler.toml`, inicialize o banco local e inicie o Worker:
+
+```bash
+npx wrangler d1 execute encurta-links --local --file=./schema.sql
+npx wrangler dev
+```
+
+## Como funciona
+
+- `POST /api/links` recebe `{ "url": "https://exemplo.com" }`, valida o endereço e grava um código aleatório de 7 caracteres no D1.
+- `GET /CODIGO` procura o destino no D1 e responde com redirecionamento HTTP 302.
+- Os links não expiram automaticamente. O site não usa Supabase nem precisa de configuração de chaves no navegador.
+- A chave de operação é a variável `DB` configurada no binding D1 de `wrangler.toml`; não coloque credenciais secretas no frontend.
+
+## Atenção para uso público
+
+Qualquer visitante pode criar links, e os destinos são públicos por natureza. Antes de divulgar amplamente, considere adicionar rate limiting e controles contra abuso. Não encurte URLs privadas. O Cloudflare D1 tem limites e cotas que dependem do plano da sua conta.
