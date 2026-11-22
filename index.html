@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10101b">
+  <meta name="description" content="Encurte links longos em segundos, com links permanentes e compartilháveis.">
+  <title>encurta. — links simples, ideias livres</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
+  <script src="./config.js"></script>
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
+  <header class="topbar wrap">
+    <a class="brand" href="./" aria-label="Encurta início"><span class="brand-icon">↗</span> encurta<span class="brand-dot">.</span></a>
+    <a class="top-link" href="#como-funciona">Como funciona <span aria-hidden="true">↗</span></a>
+  </header>
+  <main class="wrap">
+    <section class="hero">
+      <div class="eyebrow"><span class="pulse"></span> SEU LINK, SEM COMPLICAÇÃO</div>
+      <h1>Links menores.<br><span>Ideias maiores.</span></h1>
+      <p class="hero-copy">Transforme aquele link gigante em algo simples de compartilhar. Sem prazo de validade.</p>
+      <form class="shortener" id="shortenForm" novalidate>
+        <label class="sr-only" for="longUrl">Cole seu link longo</label>
+        <span class="input-icon" aria-hidden="true">↗</span>
+        <input id="longUrl" name="url" type="url" placeholder="Cole seu link longo aqui..." autocomplete="url" required>
+        <button id="shortenButton" type="submit">Encurtar link <span aria-hidden="true">→</span></button>
+      </form>
+      <p class="form-message" id="formMessage" role="status" aria-live="polite">Seus links são permanentes e ficam salvos com segurança.</p>
+      <section class="result-card" id="resultCard" hidden aria-live="polite">
+        <div class="result-label">SEU LINK CURTO ESTÁ PRONTO <span class="success-check">✓</span></div>
+        <div class="result-row"><a id="shortUrl" href="#" target="_blank" rel="noopener noreferrer"></a><button class="copy-button" id="copyButton" type="button">Copiar</button></div>
+        <p class="destination" id="destination"></p>
+      </section>
+    </section>
+    <section class="features" id="como-funciona">
+      <div class="feature"><span class="feature-icon violet">⌁</span><div><h2>Fácil de compartilhar</h2><p>Links curtos que cabem em qualquer lugar.</p></div></div>
+      <div class="feature"><span class="feature-icon green">∞</span><div><h2>Feito para durar</h2><p>O destino continua disponível sem expiração.</p></div></div>
+      <div class="feature"><span class="feature-icon orange">↗</span><div><h2>Seu link, seu controle</h2><p>Redirecionamento rápido e direto ao destino.</p></div></div>
+    </section>
+    <div class="privacy-note"><span aria-hidden="true">✳</span> Não encurtamos links para rastrear você. Só conectamos pessoas ao destino.</div>
+  </main>
+  <footer class="wrap footer"><span>© <span id="year"></span> encurta.</span><span>Pequenos links, grandes caminhos.</span></footer>
+</body>
+</html>
